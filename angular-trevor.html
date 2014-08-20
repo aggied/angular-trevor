@@ -1,0 +1,45 @@
+<style>
+	.at-icon{
+		display: inline-block;
+		font-size: 30px;
+
+	}
+	.at-icon i{
+		display: block;
+		font-size:40px;
+		margin: 0 0 .2em 0;
+	}
+	
+	.at-controls-right{
+		height:40px;
+		width:60px;
+		border:solid green 1px;
+		padding: 6px 15px;
+		display: inline;
+	}	
+</style>
+<ion-view title="AngularTrevor">
+	  <ion-nav-buttons side="left">
+	    <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
+	  </ion-nav-buttons>
+  <ion-content has-header="true" padding="true">
+  	<div ng-repeat="i in AT.blocks" class="list">
+  			{{i}}
+  			index is {{$index}}
+  			<div>
+  				 <textarea placeholder="What's your story?"  rows="8" style="color:red;border: solid gray 1px;"></textarea>
+  				 <div style="position:relative;float:right;bottom: 40px;font-size: 30px;text-align: center;">
+  				 	<div class="at-controls-right">
+  				 		<i class="icon ion-arrow-swap"></i>
+  				 	</div>
+  				 	<div  class="at-controls-right" ng-click="delBlock($index)">
+  				 		  <i class="icon ion-trash-b"></i>
+  				 	</div>
+
+  				 </div>		
+  			</div>
+			<at-new-block></at-new-block>
+		    <div ng-click="newBlock($event,i.seq)" style="font-size:20px;text-align: center;padding: 15px;background-color: rgb(230, 230, 230);margin: 10px 0px;">+</div>
+	</div>
+	</ion-content>
+</ion-view>
