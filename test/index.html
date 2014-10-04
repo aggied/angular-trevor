@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<title>Angular-Trevor test</title>
+<head>
+	<link rel="stylesheet" type="text/css" href="../bower_components/components-font-awesome/css/font-awesome.min.css">
+<style>
+	.at-icon{
+		display: inline-block;
+		font-size: 30px;
+
+	}
+	.at-icon i{
+		display: block;
+		font-size:40px;
+		margin: 0 0 .2em 0;
+	}
+	.at-editable{
+		height:50px;
+		width:100%;
+		/*border:solid gray 1px;*/
+	}
+	.at-editable:hover{
+		border:solid orange 2px;
+	}
+	.at-editable:focus{
+		border:solid orange 1px;
+	}
+	.at-controls-right{
+		height:40px;
+		width:60px;
+		border:solid green 1px;
+		padding: 6px 15px;
+		display: inline;
+	}
+	.at-hash{
+		color:blue;	
+		font-weight:bold;
+	}
+	.at-plus{
+		font-size:17px;
+		text-align: center;
+		padding: 0px;background-color: rgb(255, 255, 255);margin: 10px 0px;
+	}
+	.at-plus:hover{
+		border:dashed blue 1px;
+	}
+	.at-block-chooser{
+		text-align:center;
+		background-color:rgb(235,235,235);
+		padding: 5px;
+	}
+	.at-block-chooser a{
+		padding:5px 7px;
+	}	
+</style>
+    <script type="text/javascript">
+    	function getWordSingle(){
+    		var sel = window.getSelection();
+  		        var selectedRange = sel.getRangeAt(0);
+		        sel.collapseToStart();
+		        sel.modify("move", "backward", "word");
+		        sel.modify("extend", "forward", "word");
+		        return sel.toString();
+    	};
+        function getWord() {
+		    var sel, word = "";
+		    console.log(window.getSelection());
+		    if (window.getSelection && (sel = window.getSelection()).modify) {
+		        var selectedRange = sel.getRangeAt(0);
+		        sel.collapseToStart();
+		        sel.modify("move", "backward", "word");
+		        sel.modify("extend", "forward", "word");
+				// selectedRange.deleteContents();
+				newNode = document.createElement("b");//.appendChild(document.createTextNode("New Node Inserted Here"));
+            // selectedRange.insertNode(newNode);
+            // selectedRange.surroundContents(newNode);
+		        // word = sel.toString();
+		
+		        // Restore selection
+		        // sel.removeAllRanges();
+		        // sel.addRange(selectedRange);
+		    } else if ( (sel = document.selection) && sel.type != "Control") {
+		        var range = sel.createRange();
+		        range.collapse(true);
+		        range.expand("word");
+		        console.log(range);
+		        word = range.text;
+		    }
+		    alert(word);
+		};
+    </script>
+</head>
+<body ng-app="angular-trevor">
+<div title="AngularTrevor">
+	<div ng-controller="wrapper">
+	  	<div ng-repeat="i in AT.blocks track by $index" class="list">
+	  			<div>
+	  				<img src="https://cdn.oreillystatic.com/en/assets/1/event/119/stratany2014_logo.gif" ng-if="i.type=='image'"/>
+	  				<at-editable></at-editable>
+	  				 <!-- <textarea placeholder="What's your story?" style="color:red;border: solid gray 1px;height:150px;"></textarea> -->
+	  				 <div style="position:relative;float:right;bottom: 40px;font-size: 30px;text-align: center;">
+	  				 	<div class="at-controls-right">
+	  				 		<i class="icon ion-arrow-swap"></i>
+	  				 	</div>
+	  				 	<div  class="at-controls-right" ng-click="delBlock($index)">
+	  				 		  <i class="icon ion-trash-b"></i>
+	  				 	</div>
+	
+	  				 </div>		
+	  			</div>
+				<at-new-block></at-new-block>
+				<!-- <at-new-block3 type="image"></at-new-block3> -->
+			    <!-- <div ng-click="newBlock($event,i.seq)" style="font-size:20px;text-align: center;padding: 15px;background-color: rgb(230, 230, 230);margin: 10px 0px;">+</div> -->
+		</div>
+	</div>
+</div>
+</body>
+
+<script src="../bower_components/angular/angular.js"></script>
+<script src="app.js"></script>
+<script src="directives.js"></script>
