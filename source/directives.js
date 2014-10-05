@@ -33,24 +33,50 @@ angular.module('angular-trevor-directives', [])
     }
   };
 })
+.directive('contenteditable', function($timeout) {
+        return {
+            require: 'ngModel',
+            link: function(scope, elm, attrs, ctrl) {
+                // view -> model
+                elm.bind('blur', function() {
+                	$timeout(function() {
+	                    scope.$apply(function() {
+	                        ctrl.$setViewValue(elm.html());
+	                    });
+					});
+
+                });
+
+                // model -> view
+                ctrl.$render = function() {
+                    elm.html(ctrl.$viewValue);
+                };
+
+                // load init value from DOM
+                //ctrl.$setViewValue(elm.html());
+            }
+        };
+})
 .directive("atNewBlock", function($compile,$document) {
   var template='<div ng-click="click($event)" class="at-plus"><span>+</span></div>';
   var template_for = function(type) {
     return type+"\\.html";
   };
-  var blocks=[
-  	{
+  var blocks={
+  	image:{
   		type:'image',
   		faIcon:'fa-camera',
   		
-  	},{
+  	},
+  	text:{
   		type:'text',
   		faIcon:'fa-pencil'
   	}
-  ];
+  };
   var chooser='<div class="at-block-chooser" ng-focus="blockCancel()">';
-  for (i=0;i<blocks.length;i++){
-  	chooser+='<span class="at-block-type"><a ng-click="newBlock($event,\''+blocks[i].type+'\')"><i class="fa '+blocks[i].faIcon+'"></i><a></span>';
+  // for (i=0;i<blocks.length;i++){
+  	for (var k in blocks){
+  	chooser+='<span class="at-block-type"><a ng-click="newBlock($event,\''+k+'\')"><i class="fa '+blocks[k].faIcon+'"></i><a></span>';
   }
   chooser+='</div>';
   return {
@@ -73,8 +99,12 @@ angular.module('angular-trevor-directives', [])
          };
          $scope.newBlock=function(e,type){
          	e.stopPropagation();
-         	console.log(type);
-         	$scope.$parent.AT.blocks.push('test2');
+         	// $scope.$parent.AT.blocks.push({type:type});
+			for (j=$scope.$index+1;j<$scope.$parent.AT.blocks.length;j++){
+				$scope.$parent.AT.blocks[j].order+=1;
+			}
+			$scope.$parent.AT.blocks.splice($scope.$index+1,0,{'type':type,order:$scope.$index+1});
+			// scope.$apply();
          	var compiled=$compile(template)($scope);
          	 $element.replaceWith(compiled);
          	 $element=compiled;
@@ -89,8 +119,8 @@ angular.module('angular-trevor-directives', [])
          };
     }
   };
-}).directive("atEditable", function($compile) {
-  var template='<div contenteditable="true" class="at-editable"></div>';
+}).directive("atEditable", function($compile,$timeout) {
+  var template='<div contenteditable="true" ng-model="i.value" class="at-editable"></div>';
   var template_for = function(type) {
     return type+"\\.html";
   };
@@ -100,6 +130,12 @@ angular.module('angular-trevor-directives', [])
     // transclude: true,
     template:template,
     link: function(scope,element, attrs) {
+    	//place cursor in all new text blocks
+    	var div = document.createRange();
+		div.selectNodeContents(element[0].childNodes[0]);
+    	var sel=window.getSelection();sel.removeAllRanges();
+ 		sel.addRange(div);
+ 		
     	 element.bind("keypress", function (e) {
     	 	// http://www.javascripter.net/faq/keycodes.htm  && http://unixpapa.com/js/key.html OR http://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
  			switch (e.which) {
@@ -110,13 +146,17 @@ angular.module('angular-trevor-directives', [])
     						// string is just whitespace
     						return;
 					}
- 					scope.$parent.AT.blocks.push('test2');
- 					scope.$apply();
- 					var newBlock=element[0].parentNode.parentNode.nextSibling.nextSibling.childNodes[1].childNodes[1].childNodes[0];
- 					var div = document.createRange();
-					div.selectNodeContents(newBlock);
- 					var sel=window.getSelection();sel.removeAllRanges();
- 					sel.addRange(div);
+					// scope.$parent.AT.blocks.splice(scope.$index+1, 0, "image");
+					for (j=scope.$index+1;j<scope.$parent.AT.blocks.length;j++){
+						scope.$parent.AT.blocks[j].order+=1;
+					}
+					// scope.$parent.AT.blocks.push({'type':'text',order:scope.$index+1});
+					scope.$parent.AT.blocks.splice(scope.$index+1,0,{'type':'text',order:scope.$index+1});
+ 					// scope.$parent.AT.blocks.push('text');
+					$timeout(function() {
+						scope.$apply();
+					});
+					break;
 			    case 35:
 			        scope.watchHash=true;
 			        break;
@@ -200,6 +240,8 @@ angular.module('angular-trevor-directives', [])
 	               selectedRange.surroundContents(newNode);
 	               selectedRange.collapse(false);
 	               selectedRange.setStartAfter(newNode);
+	               if (!scope.$parent.$parent.AT.blocks[scope.$index].hashtags){scope.$parent.$parent.AT.blocks[scope.$index].hashtags=[];}
+	               scope.$parent.$parent.AT.blocks[scope.$index].hashtags.push(potHash);
 					//need to create a new text node and omve to that
 					selectedRange.insertNode(document.createTextNode("\u200B"));
 					selectedRange.collapse(false);
@@ -246,4 +288,21 @@ angular.module('angular-trevor-directives', [])
 		}
     }
   };
+})
+.directive("atImage", function() {
+ var temp='<div class="at-image-outer"><div class="at-image-inner"><i class="fa fa-camera" style="font-size:34px;"></i><p>Drag<strong>Image</strong> here</p><input type="file"/><button ng-click="uploadImage()">Upload</button><input placeholder="Or paste URL here"  type="text"></div></div>';
+
+  return {
+    restrict: "E",
+    // templateUrl:'blocks/at-image.html',
+    template:temp,
+    // transclude: true,
+    scope: true,
+    link: function(scope,element, attrs) {
+			scope.uploadImage=function(){
+				console.log('here');
+			};
+      }
+   };
 });
+

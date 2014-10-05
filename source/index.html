@@ -50,7 +50,31 @@
 	}
 	.at-block-chooser a{
 		padding:5px 7px;
-	}	
+		font-size:24px;
+	}
+	.at-block-chooser a:hover{
+		color:rgb(255,122,0);
+	}
+	
+	/*blocks*/
+	.at-image-outer{
+		border: solid gray 1px;
+		text-align: center;
+	}
+	.at-image-inner{
+		background-color:rgb(221,221,221);
+		margin:10px;
+		padding:15px 0;
+	}
+	
+	.at-image-inner input{
+		width: 80%;
+text-align: center;
+line-height: 26px;
+font-size: 16px;
+	}
+
+	
 </style>
     <script type="text/javascript">
     	function getWordSingle(){
@@ -92,10 +116,12 @@
 <body ng-app="angular-trevor">
 <div title="AngularTrevor">
 	<div ng-controller="wrapper">
-	  	<div ng-repeat="i in AT.blocks track by $index" class="list">
+	  	<div ng-repeat="i in AT.blocks | orderBy:'order'" class="list">
 	  			<div>
-	  				<img src="https://cdn.oreillystatic.com/en/assets/1/event/119/stratany2014_logo.gif" ng-if="i.type=='image'"/>
-	  				<at-editable></at-editable>
+	  				{{$index}} ?== {{i.order}}
+	  				{{i}}
+	  				<at-editable ng-if="i.type==='text'"></at-editable>
+	  				<at-image ng-if="i.type=='image'"></at-image>
 	  				 <!-- <textarea placeholder="What's your story?" style="color:red;border: solid gray 1px;height:150px;"></textarea> -->
 	  				 <div style="position:relative;float:right;bottom: 40px;font-size: 30px;text-align: center;">
 	  				 	<div class="at-controls-right">
@@ -104,13 +130,13 @@
 	  				 	<div  class="at-controls-right" ng-click="delBlock($index)">
 	  				 		  <i class="icon ion-trash-b"></i>
 	  				 	</div>
-	
 	  				 </div>		
 	  			</div>
 				<at-new-block></at-new-block>
 				<!-- <at-new-block3 type="image"></at-new-block3> -->
 			    <!-- <div ng-click="newBlock($event,i.seq)" style="font-size:20px;text-align: center;padding: 15px;background-color: rgb(230, 230, 230);margin: 10px 0px;">+</div> -->
 		</div>
+		<button ng-click="compile()">Compile</button>
 	</div>
 </div>
 </body>
