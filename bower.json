@@ -1,0 +1,22 @@
+{
+  "name": "angular-trevor",
+  "version": "0.0.0",
+  "homepage": "https://github.com/aggied/angular-trevor",
+  "authors": [
+    "aggied <sploople@gmail.com>"
+  ],
+  "description": "RTE inspired by SirTrevor.js built on Angular",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "angular": "~1.2.26",
+    "components-font-awesome": "~4.2.0"
+  }
+}
