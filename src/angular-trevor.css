@@ -1,0 +1,77 @@
+	.at-icon{
+		display: inline-block;
+		font-size: 30px;
+
+	}
+	.at-icon i{
+		display: block;
+		font-size:40px;
+		margin: 0 0 .2em 0;
+	}
+	.at-editable{
+		height:50px;
+		width:100%;
+		/*border:solid gray 1px;*/
+	}
+	.at-editable:hover{
+		border:solid orange 2px;
+	}
+	.at-editable:focus{
+		border:solid orange 1px;
+	}
+	.at-controls-right{
+		position:relative;
+		float:right;
+		bottom: 40px;
+		font-size: 20px;
+		text-align: center;
+	}
+	.at-controls-right div{
+		padding: 6px 6px;
+		display: inline;
+	}
+	.at-controls-right div:hover{
+		color:orange;
+	}
+	.at-hash{
+		color:blue;	
+		font-weight:bold;
+	}
+	.at-plus{
+		font-size:17px;
+		text-align: center;
+		padding: 0px;background-color: rgb(255, 255, 255);margin: 10px 0px;
+	}
+	.at-plus:hover{
+		border:dashed blue 1px;
+	}
+	.at-block-chooser{
+		text-align:center;
+		background-color:rgb(235,235,235);
+		padding: 5px;
+	}
+	.at-block-chooser a{
+		padding:5px 7px;
+		font-size:24px;
+	}
+	.at-block-chooser a:hover{
+		color:rgb(255,122,0);
+	}
+	
+	/*blocks*/
+	.at-image-outer{
+		border: solid gray 1px;
+		text-align: center;
+	}
+	.at-image-inner{
+		background-color:rgb(221,221,221);
+		margin:10px;
+		padding:15px 0;
+	}
+	
+	.at-image-inner input{
+		width: 80%;
+text-align: center;
+line-height: 26px;
+font-size: 16px;
+	}

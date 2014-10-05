@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<title>Angular-Trevor test</title>
+<head>
+	<link rel="stylesheet" type="text/css" href="../bower_components/components-font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="../src/angular-trevor.css">
+    <!-- <script type="text/javascript">
+    	function getWordSingle(){
+    		var sel = window.getSelection();
+  		        var selectedRange = sel.getRangeAt(0);
+		        sel.collapseToStart();
+		        sel.modify("move", "backward", "word");
+		        sel.modify("extend", "forward", "word");
+		        return sel.toString();
+    	};
+        function getWord() {
+		    var sel, word = "";
+		    console.log(window.getSelection());
+		    if (window.getSelection && (sel = window.getSelection()).modify) {
+		        var selectedRange = sel.getRangeAt(0);
+		        sel.collapseToStart();
+		        sel.modify("move", "backward", "word");
+		        sel.modify("extend", "forward", "word");
+				// selectedRange.deleteContents();
+				newNode = document.createElement("b");//.appendChild(document.createTextNode("New Node Inserted Here"));
+            // selectedRange.insertNode(newNode);
+            // selectedRange.surroundContents(newNode);
+		        // word = sel.toString();
+		
+		        // Restore selection
+		        // sel.removeAllRanges();
+		        // sel.addRange(selectedRange);
+		    } else if ( (sel = document.selection) && sel.type != "Control") {
+		        var range = sel.createRange();
+		        range.collapse(true);
+		        range.expand("word");
+		        console.log(range);
+		        word = range.text;
+		    }
+		    alert(word);
+		};
+    </script> -->
+</head>
+<body ng-app="angular-trevor">
+	<angular-trevor></angular-trevor>
+	<button ng-click="compile()">Compile</button>
+	<!-- <div title="AngularTrevor">
+		<div ng-controller="wrapper">
+		  	<div ng-repeat="i in AT.blocks | orderBy:'order'" class="list">
+		  			<div>
+		  				{{$index}} ?== {{i.order}}
+		  				{{i}}
+		  				<at-editable ng-if="i.type==='text'"></at-editable>
+		  				<at-image ng-if="i.type=='image'"></at-image>
+		  				 <div style="position:relative;float:right;bottom: 40px;font-size: 30px;text-align: center;">
+		  				 	<div class="at-controls-right">
+		  				 		<i class="icon ion-arrow-swap"></i>
+		  				 	</div>
+		  				 	<div  class="at-controls-right" ng-click="delBlock($index)">
+		  				 		  <i class="icon ion-trash-b"></i>
+		  				 	</div>
+		  				 </div>		
+		  			</div>
+					<at-new-block></at-new-block>
+			</div>
+			<button ng-click="compile()">Compile</button>
+		</div>
+	</div> -->
+</body>
+
+<script src="../bower_components/angular/angular.js"></script>
+<script src="app.js"></script>
+<script src="../src/angular-trevor-directives.js"></script>

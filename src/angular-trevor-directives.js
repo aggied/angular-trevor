@@ -1,37 +1,20 @@
 angular.module('angular-trevor-directives', [])
-
-.directive("atNewBlock2", function() {
-  var linkFunction = function(scope, element, attributes) {
-    var paragraph = element.children()[0];
-    $(paragraph).on("click", function() {
-      $(this).css({ "background-color": "red" });
-    });
-  };
-
-  return {
-    restrict: "E",
-    link: linkFunction
-  };
-})
-
-.directive("atNewBlock3", function($compile) {
-  var template=' <div ng-click="newBlock($event,i.seq)" style="font-size:20px;text-align: center;padding: 15px;background-color: rgb(230, 230, 230);margin: 10px 0px;">+</div>';
-  var template_for = function(type) {
-    return type+"\\.html";
-  };
-  
-  return {
-    restrict: "E",
-    // transclude: true,
-    scope: true,
-    compile: function(element, attrs) {
-      return function(scope, element, attrs) {
-        var tmpl = template_for(scope.component.type);
-        element.html($("#"+tmpl).html()).show();
-        $compile(element.contents())(scope);
-      };
-    }
-  };
+.directive('angularTrevor', function() {
+	var temp='<div ng-repeat="i in AT.blocks" class="list"><div><at-editable ng-if="i.type===\'text\'"></at-editable><at-image ng-if="i.type==\'image\'"></at-image><div class="at-controls-right"><div><i class="fa fa-arrows-v"></i></div><div ng-click="delBlock($index)"><i class="fa fa-trash"></i></div></div></div><at-new-block></at-new-block></div>';
+        return {
+        	template:temp,
+        	restrict:'EAC',
+            link: function($scope, elm, attrs) {
+				$scope.AT={};
+				$scope.AT.blocks=[
+					{type:'text',order:0},
+				];
+				$scope.compile=function(){
+					var output=$scope.AT;
+					console.log(output);
+				};
+            }
+        };
 })
 .directive('contenteditable', function($timeout) {
         return {

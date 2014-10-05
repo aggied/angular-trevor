@@ -4,7 +4,4 @@ angular.module('angular-trevor', ['angular-trevor-directives'])
 	$scope.AT.blocks=[
 		{type:'text',order:0},
 		];
-	$scope.compile=function(){
-		console.log($scope.AT);
-	};
 });
