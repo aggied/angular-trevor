@@ -19,19 +19,28 @@
 	.at-editable:focus{
 		border:solid orange 1px;
 	}
+
+	.at-block{
+		
+	}
 	.at-controls-right{
 		position:relative;
 		float:right;
 		bottom: 40px;
 		font-size: 20px;
 		text-align: center;
+		display:none;
 	}
 	.at-controls-right div{
 		padding: 6px 6px;
 		display: inline;
+		/*display:none;*/
 	}
 	.at-controls-right div:hover{
 		color:orange;
+	}
+	.at-block:hover .at-controls-right, .at-block.hover .at-controls-right{
+		display:inline;
 	}
 	.at-hash{
 		color:blue;	
@@ -71,7 +80,48 @@
 	
 	.at-image-inner input{
 		width: 80%;
-text-align: center;
-line-height: 26px;
-font-size: 16px;
+		text-align: center;
+		line-height: 26px;
+		font-size: 16px;
 	}
+	
+	.atPointer{
+		cursor:pointer;
+	}
+	
+	.atAutoComp{
+		position:fixed;
+		border:solid gray 1px;
+	}
+
+	.atAutoComp li{
+		border-bottom:solid gray 1px;
+ -moz-user-select: -moz-none;
+   -khtml-user-select: none;
+   -webkit-user-select: none;
+
+   /*
+     Introduced in IE 10.
+     See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
+   */
+   -ms-user-select: none;
+   user-select: none;
+	}
+	
+	.atAutoComp li p.item{
+		font-weight: bold;
+		padding:0px;
+		margin:2px 0px;
+	}
+	
+	.atAutoComp li p.type{
+		font-style: italic;
+		font-size:12px;
+		padding:0px;
+		margin:0px;
+	}	
+	
+	.atAutoComp li:hover{
+		background-color:gray;
+	}
+
