@@ -1,6 +1,6 @@
 angular.module('angular-trevor-directives', [])
 .directive('angularTrevor', function() {
-	var temp='<div ng-repeat="i in AT.blocks" class="list"><div class="at-block"><at-editable ng-if="i.type===\'text\'"></at-editable><at-image ng-if="i.type==\'image\'"></at-image><div class="at-controls-right"><div><i class="fa fa-arrows-v"></i></div><div ng-click="delBlock($index)"><i class="fa fa-trash"></i></div></div></div><at-new-block></at-new-block></div>';
+	var temp='<div ng-repeat="i in AT.blocks" class="list"><div class="at-block"><at-editable ng-if="i.type===\'text\'"></at-editable><at-image ng-if="i.type==\'image\'"></at-image><at-embed ng-if="i.type===\'embed\'"></at-embed><div class="at-controls-right"><div><i class="fa fa-arrows-v"></i></div><div ng-click="delBlock($index)"><i class="fa fa-trash"></i></div></div></div><at-new-block></at-new-block></div>';
         return {
         	template:temp,
         	restrict:'EAC',
@@ -43,21 +43,52 @@ angular.module('angular-trevor-directives', [])
             }
         };
 })
+.directive("atEmbed", function($http) {
+ var temp='<div class="at-image-outer"><div class="at-image-inner"><i class="fa fa-link" style="font-size:34px;"></i><input ng-model="inputs.url" ng-paste="generateEmbed($event.clipboardData.getData(\'text/plain\'))" placeholder="type or paste URL here"  type="text"></div></div>';
+
+  return {
+    restrict: "E",
+    // templateUrl:'blocks/at-image.html',
+    template:temp,
+    // transclude: true,
+    scope: true,
+    link: function(scope,element, attrs) {
+    		scope.inputs={};
+    		scope.generateEmbed=function(url){
+    			console.log(url);
+    			    			// console.log(scope.inputs);
+ 			$http({
+			  	url: "http://api.embed.ly/1/oembed",
+			    method: "GET",
+			    params: {
+					url: url,
+					key:'e17039e0f50c491eac002974d0846733',
+			    	}				
+			}).success(function(data, status, headers, config) {
+			  	var newTemp='<a class="embedly-card" href="http://soundcloud.com/whichlight/how-to-pronounce-my-name">How to pronounce my name by whichlight</a><script async src="//cdn.embedly.com/widgets/platform.js" charset="UTF-8"></script>';
+			  	element.replaceWith(newTemp);
+			  }).
+			  error(function(data, status, headers, config) {});
+    		};
+      }
+   };
+})
 .directive("atNewBlock", function($compile,$document) {
   var template='<div ng-click="click($event)" class="at-plus"><span>+</span></div>';
   var template_for = function(type) {
     return type+"\\.html";
   };
   var blocks={
+  	text:{
+  		faIcon:'fa-pencil'
+  	},
   	image:{
-  		type:'image',
   		faIcon:'fa-camera',
   		
   	},
-  	text:{
-  		type:'text',
-  		faIcon:'fa-pencil'
-  	}
+	embed:{
+		faIcon:'fa-link'
+	}
   };
   var chooser='<div class="at-block-chooser" ng-focus="blockCancel()">';
   // for (i=0;i<blocks.length;i++){
@@ -105,8 +136,8 @@ angular.module('angular-trevor-directives', [])
          };
     }
   };
-}).directive("atEditable", function($compile,$timeout) {
-  var template='<div contenteditable="true" ng-model="i.value" class="at-editable"></div><div class="atAutoComp" style="display:inline;"><li ng-repeat="i in autocomplete" ng-mousedown="entSelect($event,i)"><p class="item">{{i.value}}</p><p class="type">{{i.entType}}</p></li></div>';
+}).directive("atEditable", function($compile,$timeout,$http,$document) {
+  var template='<div contenteditable="true" ng-model="i.value" class="at-editable" ng-mouseup="showControls($event,i)"></div><div class="atAutoComp" ><li ng-repeat="i in autocomplete" ng-mousedown="entSelect($event,i)"><p class="atAutoName">{{i.name}}</p><p class="atAutoSubname">{{i.subname}}</p></li></div><div class="at-text-controls"><li><button class="stopProp" style="font-weight:bold;" unselectable="on" ng-click="bold($event)">B</button></li><li ><button class="stopProp" unselectable="on" style="font-style:italic;" ng-click="italic($event)">i</button></li></div>';
   var template_for = function(type) {
     return type+"\\.html";
   };
@@ -159,40 +190,77 @@ angular.module('angular-trevor-directives', [])
 			    case 32:
  					removeAutoComplete();
  					getWord(4,true);
-			    	// spaceHash();
-			        // if (getSelectionContainerElement().getAttribute('class')=='at-hash'){
-               			// unwrapHash();
-              		// }
-			    	// else if (scope.watchHash){
-			   			// wrapHash();scope.watchHash=false;
-			    	// }
 			        break;
         	   default:
         	   		var word=getWord(3);
         	   		if (!word)break;
         	   		if (word.word.length>2){
+        	   			//get first character and watch for autocomplete
+        	   			var firstChar=word.word.charAt(0);
+        	   			if (firstChar==='^'){
+        	   				geocomplete(word.word);
+        	   			}
+        	   			//add line height to top
+        	   			var top=parseInt(word.pos.top.split('px')[0])+13;
+        	   			angular.element(element[0].children[1]).css('top',top.toString()+'px');
+        	   			angular.element(element[0].children[1]).css('left',word.pos.left);   			
         	   			// socket.emit('autocomplete',{q:word.word.trim(),index:scope.$index});
-        	   			autocompleteTest(word.word.trim());
         	   		}
-        	   
         	   // http://stackoverflow.com/questions/6665997/switch-statement-for-greater-than-less-than
 			   // if (((e.which >= 48) && (e.which <= 57)) || ((e.which >= 65) && (e.which <= 90)) ||((e.which >= 97) && (e.which <= 122)) || e.which==95){
 			   	  // // console.log('alpha_numeric');		   	
 			   // }
-
 			   		break;
 			}
     	 });
-    	function removeAutoComplete(){
-    		// scope.autocomplete=[];
+    	function removeAutoComplete(apply){
+    		scope.autocomplete=[];
+			$timeout(function() {
+				scope.$apply();
+			});
     	}; 
     	
-    	function autocompleteTest(word){
-    		
-    	}
-    	
     	var stopwords=['a'];
-    	// ==========================================	    	
+    	// ==========================================	 
+    	scope.showControls=function(e,index){
+			var sel=window.getSelection(), selectedRange=sel.getRangeAt(0);
+			if (sel.anchorNode.parentElement.nodeName=="B"){
+				//already bold, make button orange
+				angular.element(element[0].children[2].children[0].children[0]).css('color','orange');
+			}
+			if (sel.anchorNode.parentElement.nodeName=="I"){
+				angular.element(element[0].children[2].children[1].children[0]).css('color','orange');
+			}
+    		if (selectedRange.toString().length>0){
+    			var caretPos=getCaretPixelPos();var top=parseInt(caretPos.top.split('px')[0])-30;
+    			//place closer to the middle
+    			// var left=parseInt(caretPos.top.split('px')[0])-(selectedRange.toString().length*.4);
+    			angular.element(element[0].children[2]).css('top',top.toString()+'px');
+    			angular.element(element[0].children[2]).css('left',caretPos.left);
+    			angular.element(element[0].children[2]).css('display','inline');
+    			e.stopPropagation(); 
+		  		$document.bind('mousedown', scope.hideControls);  					
+    		}
+    	};
+    	
+    	scope.hideControls=function(e){
+			// angular.element(element[0].children[2].children[0].children[0]).css('color','white');
+			angular.element(element[0]).find('button').css('color','white');
+    		if (e && angular.element(e.target).hasClass('stopProp')){
+    			return false;
+    		}
+    		angular.element(element[0].children[2]).css('display','none');
+    		$document.unbind('mousedown', scope.hideControls);   
+    		return false;
+    	};
+    	scope.bold=function(e){
+    		document.execCommand ('bold', false, null);
+    		scope.hideControls();
+    	};
+    	scope.italic=function(e){
+    		document.execCommand ('italic', false, null);	
+    		scope.hideControls();
+    	};
     	scope.entSelect=function(e,ent){
     		e.preventDefault(); 
     		var word=getWord(0,false,true);
@@ -200,7 +268,10 @@ angular.module('angular-trevor-directives', [])
     		var replacedString = word.node.textContent.replace(re, '<span>'+ent.value+' '+'</span>');
     		var testString=word.node.parentNode.innerHTML;
     		var newNode = document.createElement("span");
-            newNode.setAttribute("class","at-hash");
+    		if (!ent.className){
+    			ent.className='at-hash';
+    		}
+            newNode.setAttribute("class",ent.className);
             var selectedRange=word.sel.getRangeAt(0);
             selectedRange.surroundContents(newNode);
             newNode.textContent=" "+ent.value+" ";
@@ -211,10 +282,6 @@ angular.module('angular-trevor-directives', [])
 			selectedRange.collapse(false);
             word.sel.removeAllRanges();
 	        word.sel.addRange(selectedRange);
-    		// var newNode = document.createTextNode(replacedString);
-    		// word.node.parentNode.replaceChild(newNode,word.node);
-    		
-    		// replacelastElement(element[0].childNodes[0],ent.value+" ","at-hash");
     		removeAutoComplete();
     	};
     	
@@ -230,6 +297,7 @@ angular.module('angular-trevor-directives', [])
 			sel.modify("extend","backward","character");
 			var word=sel.toString();
 			var wordNode=sel.anchorNode;
+			var caretPos=getCaretPixelPos();
 			if (checkEnts && word.length>minLen-1){
 				if (spaceHash(word,sel)){
 					entityCheck(word.slice(1));
@@ -244,11 +312,12 @@ angular.module('angular-trevor-directives', [])
 			}
 			if (word.length>=minLen){
 				// return {word:word,offset:wordOffset,rect:wordRect};
-				return {word:word,node:wordNode,sel:sel};
+				return {word:word,node:wordNode,sel:sel,offset:wordOffset,pos:caretPos};
 			}
 			return false;
 			
 		};
+		
     	function entityCheck(word){
     		// this function checks emits all capitalized words to the server for updating  recommendations on the fly
     		var puncts='.,;"\'()!';
@@ -263,8 +332,6 @@ angular.module('angular-trevor-directives', [])
     		if (stopwords.indexOf(word.toLowerCase())>-1){return;}
     		// socket.emit('checkEntity',{w:word});
     	}
-    	
-    	
     	function unwrapHash(){
     		var text=getSelectionContainerElement().innerHTML;
     		console.log(text);
@@ -349,6 +416,37 @@ angular.module('angular-trevor-directives', [])
 		    }
 		}
 
+		function geocomplete(word){
+			$http({
+			  	url: "http://api.geonames.org/searchJSON",
+			    method: "GET",
+			    params: {
+					featureClass: "P",
+					username:'globismTeam',
+					style: "full",
+					maxRows: 8,
+					// name_startsWith: request.term
+					q: word.substr(1),
+			    	}				
+			}).success(function(data, status, headers, config) {
+				removeAutoComplete();
+					for (var i=0;i<data.geonames.length;i++){
+						scope.autocomplete.push({
+							name:data.geonames[i].toponymName,
+							subname:data.geonames[i].countryName,
+							value:"^"+data.geonames[i].toponymName,
+							object:data.geonames[i],
+							entType:'geotag',
+							className:'at-geotag'
+						});
+					}
+			  }).
+			  error(function(data, status, headers, config) {
+			    // called asynchronously if an error occurs
+			    // or server returns response with an error status.
+			  });
+		};
+
 		function getSelectionContainerElement() {
 		    var range, sel, container;
 		    if (document.selection && document.selection.createRange) {
@@ -383,6 +481,56 @@ angular.module('angular-trevor-directives', [])
 		        }   
 		    }
 		}
+		function getCaretPixelPos($node, offsetx, offsety){
+		    offsetx = offsetx || 0;
+		    offsety = offsety || 0;
+		
+		    var nodeLeft = 0,
+		        nodeTop = 0;
+		    if ($node){
+		        nodeLeft = $node.offsetLeft;
+		        nodeTop = $node.offsetTop;
+		    }
+		
+		    var pos = {left: 0, top: 0};
+		
+		    if (document.selection){
+		        var range = document.selection.createRange();
+		        pos.left = range.offsetLeft + offsetx - nodeLeft + 'px';
+		        pos.top = range.offsetTop + offsety - nodeTop + 'px';
+		    }else if (window.getSelection){
+		        var sel = window.getSelection();
+		        var range = sel.getRangeAt(0).cloneRange();
+		        try{
+		            range.setStart(range.startContainer, range.startOffset-1);
+		        }catch(e){}
+		        var rect = range.getBoundingClientRect();
+		        if (range.endOffset == 0 || range.toString() === ''){
+		            // first char of line
+		            if (range.startContainer == $node){
+		                // empty div
+		                if (range.endOffset == 0){
+		                    pos.top = '0px';
+		                    pos.left = '0px';
+		                }else{
+		                    // firefox need this
+		                    var range2 = range.cloneRange();
+		                    range2.setStart(range2.startContainer, 0);
+		                    var rect2 = range2.getBoundingClientRect();
+		                    pos.left = rect2.left + offsetx - nodeLeft + 'px';
+		                    pos.top = rect2.top + rect2.height + offsety - nodeTop + 'px';
+		                }
+		            }else{
+		                pos.top = range.startContainer.offsetTop+'px';
+		                pos.left = range.startContainer.offsetLeft+'px';
+		            }
+		        }else{
+		            pos.left = rect.left + rect.width + offsetx - nodeLeft + 'px';
+		            pos.top = rect.top + offsety - nodeTop + 'px';
+		        }
+		    }
+		    return pos;
+		};
     }
   };
 })

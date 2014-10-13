@@ -11,6 +11,7 @@
 	.at-editable{
 		height:50px;
 		width:100%;
+		line-height:13px;
 		/*border:solid gray 1px;*/
 	}
 	.at-editable:hover{
@@ -21,15 +22,16 @@
 	}
 
 	.at-block{
-		
+		position:relative;
 	}
 	.at-controls-right{
-		position:relative;
-		float:right;
-		bottom: 40px;
+		position:absolute;
+		bottom: 0px;
+		right:0px;
 		font-size: 20px;
 		text-align: center;
 		display:none;
+		border:solid 1px orange;
 	}
 	.at-controls-right div{
 		padding: 6px 6px;
@@ -90,31 +92,33 @@
 	}
 	
 	.atAutoComp{
+		background-color:white;
 		position:fixed;
 		border:solid gray 1px;
+		display:inline;
 	}
 
 	.atAutoComp li{
+		list-style-type:none;
 		border-bottom:solid gray 1px;
- -moz-user-select: -moz-none;
-   -khtml-user-select: none;
-   -webkit-user-select: none;
-
-   /*
-     Introduced in IE 10.
-     See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
-   */
-   -ms-user-select: none;
-   user-select: none;
+ 		-moz-user-select: -moz-none;
+   		-khtml-user-select: none;
+   		-webkit-user-select: none;
+	   /*
+	     Introduced in IE 10.
+	     See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
+	   */
+	   -ms-user-select: none;
+	   user-select: none;
 	}
 	
-	.atAutoComp li p.item{
+	.atAutoComp li p.atAutoName{
 		font-weight: bold;
 		padding:0px;
 		margin:2px 0px;
 	}
 	
-	.atAutoComp li p.type{
+	.atAutoComp li p.atAutoSubname{
 		font-style: italic;
 		font-size:12px;
 		padding:0px;
@@ -122,6 +126,53 @@
 	}	
 	
 	.atAutoComp li:hover{
-		background-color:gray;
+		background-color:rgb(216, 215, 215);
 	}
 
+	.at-geotag{
+		color:orange;	
+		font-weight:bold;		
+	}
+	
+	.at-text-controls{
+		list-style-type:none;
+		cursor:pointer;
+		display:none;
+		background-color:black;
+		color:white;
+		position:fixed;	
+		padding:4px 0;
+ 		-moz-user-select: -moz-none;
+   		-khtml-user-select: none;
+   		-webkit-user-select: none;
+	   /*
+	     Introduced in IE 10.
+	     See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
+	   */
+	   -ms-user-select: none;
+	   user-select: none;
+	}
+	.at-text-controls li{
+		display:inline;
+		border-right:solid white 1px;	
+		padding:10px;
+ 		-moz-user-select: -moz-none;
+   		-khtml-user-select: none;
+   		-webkit-user-select: none;
+	   /*
+	     Introduced in IE 10.
+	     See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
+	   */
+	   -ms-user-select: none;
+	   user-select: none;
+	}
+	
+	.at-text-controls li button{
+		color:white;
+		background-color:black;
+		border:none;
+	}
+
+	.at-text-controls li:hover, .at-text-controls li button:hover{
+		color:orange;
+	}
