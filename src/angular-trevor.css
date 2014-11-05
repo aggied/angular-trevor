@@ -9,17 +9,27 @@
 		margin: 0 0 .2em 0;
 	}
 	.at-editable{
-		height:50px;
+		display:block;
+		word-wrap: break-word;
+  		word-break: break-all;
+		min-height:50px;
 		width:100%;
 		line-height:13px;
 		/*border:solid gray 1px;*/
+/*		-webkit-transform: translateZ(0);
+		http://aerotwist.com/blog/on-translate3d-and-layer-creation-hacks/*/
+	}
+
+	.at-editable[placeholder]:empty:before {
+    content: attr(placeholder);
+    color: #CCC; 
 	}
 	.at-editable:hover{
 		border:solid orange 2px;
 	}
 	.at-editable:focus{
 		border:solid orange 1px;
-		outline:none;
+		outline: none;
 	}
 
 	.at-block{
@@ -37,10 +47,11 @@
 	.at-controls-right div{
 		padding: 6px 6px;
 		display: inline;
+		cursor:pointer;
 		/*display:none;*/
 	}
 	.at-controls-right div:hover{
-		color:orange;
+		color:rgb(209,110,31);
 	}
 	.at-block:hover .at-controls-right, .at-block.hover .at-controls-right{
 		display:inline;
@@ -50,12 +61,15 @@
 		font-weight:bold;
 	}
 	.at-plus{
-		font-size:17px;
+		font-size:14px;
 		text-align: center;
-		padding: 0px;background-color: rgb(255, 255, 255);margin: 10px 0px;
+		padding: 0px;
+		background-color: rgb(255, 255, 255);
+		margin: 4px 0px;
+		color: rgb(175, 175, 175);
 	}
 	.at-plus:hover{
-		border:dashed blue 1px;
+		border:dashed gray 1px;
 	}
 	.at-block-chooser{
 		text-align:center;
@@ -94,9 +108,9 @@
 	
 	.atAutoComp{
 		background-color:white;
-		position:fixed;
-		border:solid gray 1px;
-		display:inline;
+		/*position:fixed;*/
+		border:solid rgb(219, 219, 219) 1px;
+		/*display:inline;*/
 	}
 
 	.atAutoComp li{
@@ -126,6 +140,10 @@
 		margin:0px;
 	}	
 	
+	li.atAutoCompSelected{
+		background-color:rgb(216,215,215);
+	}
+
 	.atAutoComp li:hover{
 		background-color:rgb(216, 215, 215);
 	}
@@ -177,3 +195,51 @@
 	.at-text-controls li:hover, .at-text-controls li button:hover{
 		color:orange;
 	}
+
+	.at-img-card-inner{
+		display: table;
+	}
+	
+	.at-img-wrap{
+		border: solid gray 1px;
+		margin-left: auto;
+		margin-right: auto;
+		text-align: center;
+		display: table;
+		padding: 0 0 25px 0;
+	}
+
+	.at-img-caption{
+		display:table-caption;
+		caption-side:bottom;
+		font-weight: bold;
+	}
+
+.oEmbed{
+	margin-right:auto;
+	margin-left:auto;
+	width: 75%;
+	max-width:	650px;
+	padding: 0 0 25px 0;
+	border: solid 1px rgb(226, 224, 224);
+}
+
+.oEmbed a{
+	color:rgb(15, 15, 109);
+	text-decoration: none;
+}
+
+.oEmbed-card-inner{
+	display: table;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.oEmbed-card-caption{
+	display:table-caption;
+	caption-side:bottom;
+}
+
+.oEmbedSideBar{
+	/*border-left: solid 8px rgb(11, 23, 111);*/
+}
