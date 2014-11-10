@@ -68,7 +68,7 @@ angular.module('angular-trevor-directives', [])
         //   var url = '
         // }
       $http({
-          url: 'http://www.iframely.com:8061/iframely',
+          url: 'http://alpha.test.com:8061/iframely',
           method: "GET",
           params: {
               uri:uri,
@@ -225,9 +225,11 @@ angular.module('angular-trevor-directives', [])
           case 35:
               scope.watchHash=true;
               break;
-          case 32:
+          case 32: //space
             removeAutoComplete();
             getWord(4,true);
+            // exitWrapElement();
+            // regexOnSpace();
             break;
           case 37: // left
             break;
@@ -243,20 +245,21 @@ angular.module('angular-trevor-directives', [])
               autocompleteArrow(1);
               break; 
           default:
-            var word=getWord(3,false,false,String.fromCharCode(e.which));
-            if (!word)break;
-            if (word.word.length>2){
-              //get first character and watch for autocomplete
-              var firstChar=word.word.charAt(0);
-              if (firstChar==='^'){
-                geocomplete(word.word);
-              }
-              //add line height to top for autocopmlete
-              var top=parseInt(word.pos.top.split('px')[0])+13;
-              angular.element(element[0].children[1]).css('top',top.toString()+'px');
-              angular.element(element[0].children[1]).css('left',word.pos.left);
-              // socket.emit('autocomplete',{q:word.word.trim(),index:scope.$index});
-            }
+            // var word=getWord(3,false,false,String.fromCharCode(e.which));
+            // if (!word)break;
+            // if (word.word.length>2){
+            //  //get first character and watch for autocomplete
+            //  var firstChar=word.word.charAt(0);
+            //  if (firstChar==='^'){
+            //    geocomplete(word.word);
+            //  }
+            //  //add line height to top for autocopmlete
+            //  var top=parseInt(word.pos.top.split('px')[0])+13;
+            //  angular.element(element[0].children[1]).css('top',top.toString()+'px');
+            //  angular.element(element[0].children[1]).css('left',word.pos.left);
+            //  // socket.emit('autocomplete',{q:word.word.trim(),index:scope.$index});
+            // }
+          regexAll(String.fromCharCode(e.which));
              // http://stackoverflow.com/questions/6665997/switch-statement-for-greater-than-less-than
          // if (((e.which >= 48) && (e.which <= 57)) || ((e.which >= 65) && (e.which <= 90)) ||((e.which >= 97) && (e.which <= 122)) || e.which==95){
             // // console.log('alpha_numeric');       
@@ -394,24 +397,20 @@ angular.module('angular-trevor-directives', [])
       
     };
     
-      function entityCheck(word){
-        // this function checks emits all capitalized words to the server for updating  recommendations on the fly
-        var puncts='.,;"\'()!';
-        word=word.trim();
-        if (!/[A-Z]/.test(word[0])){
-          //only automplete capitalized words for now
-          return;
-        }
-        if (puncts.indexOf(word[word.length-1])>-1){
-          word=word.substr(0,word.length-1);
-        }
-        if (stopwords.indexOf(word.toLowerCase())>-1){return;}
-        // socket.emit('checkEntity',{w:word});
+    function entityCheck(word){
+      // this function checks emits all capitalized words to the server for updating  recommendations on the fly
+      var puncts='.,;"\'()!';
+      word=word.trim();
+      if (!/[A-Z]/.test(word[0])){
+        //only automplete capitalized words for now
+        return;
       }
-      function unwrapHash(){
-        var text=getSelectionContainerElement().innerHTML;
-        console.log(text);
-      };
+      if (puncts.indexOf(word[word.length-1])>-1){
+        word=word.substr(0,word.length-1);
+      }
+      if (stopwords.indexOf(word.toLowerCase())>-1){return;}
+      // socket.emit('checkEntity',{w:word});
+    }
     function wrapHash(){    
                 var sel = window.getSelection();
             sel.collapseToStart();
@@ -457,8 +456,8 @@ angular.module('angular-trevor-directives', [])
       //create new 0-width element as a workaround to getting stuck in the new span element
       selectedRange.insertNode(document.createTextNode("\u200B"));
       selectedRange.collapse(false);
-                    sel.removeAllRanges();
-        sel.addRange(selectedRange);
+      sel.removeAllRanges();
+      sel.addRange(selectedRange);
     };
     function spaceHash(potHash,sel){
             var nodeContents=sel.anchorNode.textContent;
@@ -480,6 +479,106 @@ angular.module('angular-trevor-directives', [])
                 return false;   
             }
     };
+
+    function exitWrapElement(){
+      //this function exits a wrapped element on space press
+      var sel = window.getSelection();
+      var anchor = sel.anchorNode;
+      var selectedRange=sel.getRangeAt(0);
+      var pClasses = anchor.parentNode.classList;
+
+      if (!pClasses.contains('at-editable')){
+        //get out of the span!
+        var blankNode = document.createTextNode("\u200B");
+        anchor.parentNode.insertBefore(blankNode, anchor.parentNode.nextSibling);
+        selectedRange.setStartAfter(blankNode);
+        selectedRange.collapse(false);
+        sel.removeAllRanges();
+        sel.addRange(selectedRange);
+      }
+    };
+
+    function regexOnSpace(){
+      var curText = element[0].innerText;
+      var curNode = document.getSelection().anchorNode;
+      var parentNode = curNode.parentNode;
+      var curNodeText = curNode.textContent;
+      var hashArray = curNodeText.split(/(#|＃)([a-z0-9_\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u00ff\u0100-\u024f\u0253-\u0254\u0256-\u0257\u0300-\u036f\u1e00-\u1eff\u0400-\u04ff\u0500-\u0527\u2de0-\u2dff\ua640-\ua69f\u0591-\u05bf\u05c1-\u05c2\u05c4-\u05c5\u05d0-\u05ea\u05f0-\u05f4\ufb12-\ufb28\ufb2a-\ufb36\ufb38-\ufb3c\ufb40-\ufb41\ufb43-\ufb44\ufb46-\ufb4f\u0610-\u061a\u0620-\u065f\u066e-\u06d3\u06d5-\u06dc\u06de-\u06e8\u06ea-\u06ef\u06fa-\u06fc\u0750-\u077f\u08a2-\u08ac\u08e4-\u08fe\ufb50-\ufbb1\ufbd3-\ufd3d\ufd50-\ufd8f\ufd92-\ufdc7\ufdf0-\ufdfb\ufe70-\ufe74\ufe76-\ufefc\u200c-\u200c\u0e01-\u0e3a\u0e40-\u0e4e\u1100-\u11ff\u3130-\u3185\ua960-\ua97f\uac00-\ud7af\ud7b0-\ud7ff\uffa1-\uffdc\u30a1-\u30fa\u30fc-\u30fe\uff66-\uff9f\uff10-\uff19\uff21-\uff3a\uff41-\uff5a\u3041-\u3096\u3099-\u309e\u3400-\u4dbf\u4e00-\u9fff\u20000-\u2a6df\u2a700-\u2b73f\u2b740-\u2b81f\u2f800-\u2fa1f]*[a-z_\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u00ff\u0100-\u024f\u0253-\u0254\u0256-\u0257\u0300-\u036f\u1e00-\u1eff\u0400-\u04ff\u0500-\u0527\u2de0-\u2dff\ua640-\ua69f\u0591-\u05bf\u05c1-\u05c2\u05c4-\u05c5\u05d0-\u05ea\u05f0-\u05f4\ufb12-\ufb28\ufb2a-\ufb36\ufb38-\ufb3c\ufb40-\ufb41\ufb43-\ufb44\ufb46-\ufb4f\u0610-\u061a\u0620-\u065f\u066e-\u06d3\u06d5-\u06dc\u06de-\u06e8\u06ea-\u06ef\u06fa-\u06fc\u0750-\u077f\u08a2-\u08ac\u08e4-\u08fe\ufb50-\ufbb1\ufbd3-\ufd3d\ufd50-\ufd8f\ufd92-\ufdc7\ufdf0-\ufdfb\ufe70-\ufe74\ufe76-\ufefc\u200c-\u200c\u0e01-\u0e3a\u0e40-\u0e4e\u1100-\u11ff\u3130-\u3185\ua960-\ua97f\uac00-\ud7af\ud7b0-\ud7ff\uffa1-\uffdc\u30a1-\u30fa\u30fc-\u30fe\uff66-\uff9f\uff10-\uff19\uff21-\uff3a\uff41-\uff5a\u3041-\u3096\u3099-\u309e\u3400-\u4dbf\u4e00-\u9fff\u20000-\u2a6df\u2a700-\u2b73f\u2b740-\u2b81f\u2f800-\u2fa1f][a-z0-9_\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u00ff\u0100-\u024f\u0253-\u0254\u0256-\u0257\u0300-\u036f\u1e00-\u1eff\u0400-\u04ff\u0500-\u0527\u2de0-\u2dff\ua640-\ua69f\u0591-\u05bf\u05c1-\u05c2\u05c4-\u05c5\u05d0-\u05ea\u05f0-\u05f4\ufb12-\ufb28\ufb2a-\ufb36\ufb38-\ufb3c\ufb40-\ufb41\ufb43-\ufb44\ufb46-\ufb4f\u0610-\u061a\u0620-\u065f\u066e-\u06d3\u06d5-\u06dc\u06de-\u06e8\u06ea-\u06ef\u06fa-\u06fc\u0750-\u077f\u08a2-\u08ac\u08e4-\u08fe\ufb50-\ufbb1\ufbd3-\ufd3d\ufd50-\ufd8f\ufd92-\ufdc7\ufdf0-\ufdfb\ufe70-\ufe74\ufe76-\ufefc\u200c-\u200c\u0e01-\u0e3a\u0e40-\u0e4e\u1100-\u11ff\u3130-\u3185\ua960-\ua97f\uac00-\ud7af\ud7b0-\ud7ff\uffa1-\uffdc\u30a1-\u30fa\u30fc-\u30fe\uff66-\uff9f\uff10-\uff19\uff21-\uff3a\uff41-\uff5a\u3041-\u3096\u3099-\u309e\u3400-\u4dbf\u4e00-\u9fff\u20000-\u2a6df\u2a700-\u2b73f\u2b740-\u2b81f\u2f800-\u2fa1f]*)/);
+
+        if (hashArray.length>1){
+          var newNodes = [];
+          var sel = window.getSelection();
+          var selectedRange=sel.getRangeAt(0);
+          console.log(hashArray);
+          for (var i=0;i<hashArray.length;i+=4){
+            newNodes.push(document.createTextNode(hashArray[i]));
+            var spanText = document.createTextNode("#"+hashArray[i+2]);
+            var newSpan = document.createElement('span');
+            newSpan.setAttribute('class','at-hash');
+            newSpan.appendChild(spanText);
+            newNodes.push(newSpan);
+          }
+          parentNode.replaceChild(newNodes[newNodes.length-1],curNode);
+          for (var j=newNodes.length-2;j>-1;j--){
+           parentNode.insertBefore(newNodes[j],newNodes[j+1]); 
+          }
+          console.log(newNodes);
+          placeCaretAtEnd(element[0].children[0]);
+        };
+    };
+
+    function regexAll(curChar){
+      // var res = element[0].innerText.match(/(\s)|(^)#([a-z][a-z0-9\_]*)/ig);
+      var curText = element[0].innerText;
+      var curNode = document.getSelection().anchorNode;
+      var parentNode = curNode.parentNode;
+      var curNodeText = curNode.textContent;
+      //curNodeText2 = curNodeText.replace(/(#|＃)([a-z0-9_\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u00ff\u0100-\u024f\u0253-\u0254\u0256-\u0257\u0300-\u036f\u1e00-\u1eff\u0400-\u04ff\u0500-\u0527\u2de0-\u2dff\ua640-\ua69f\u0591-\u05bf\u05c1-\u05c2\u05c4-\u05c5\u05d0-\u05ea\u05f0-\u05f4\ufb12-\ufb28\ufb2a-\ufb36\ufb38-\ufb3c\ufb40-\ufb41\ufb43-\ufb44\ufb46-\ufb4f\u0610-\u061a\u0620-\u065f\u066e-\u06d3\u06d5-\u06dc\u06de-\u06e8\u06ea-\u06ef\u06fa-\u06fc\u0750-\u077f\u08a2-\u08ac\u08e4-\u08fe\ufb50-\ufbb1\ufbd3-\ufd3d\ufd50-\ufd8f\ufd92-\ufdc7\ufdf0-\ufdfb\ufe70-\ufe74\ufe76-\ufefc\u200c-\u200c\u0e01-\u0e3a\u0e40-\u0e4e\u1100-\u11ff\u3130-\u3185\ua960-\ua97f\uac00-\ud7af\ud7b0-\ud7ff\uffa1-\uffdc\u30a1-\u30fa\u30fc-\u30fe\uff66-\uff9f\uff10-\uff19\uff21-\uff3a\uff41-\uff5a\u3041-\u3096\u3099-\u309e\u3400-\u4dbf\u4e00-\u9fff\u20000-\u2a6df\u2a700-\u2b73f\u2b740-\u2b81f\u2f800-\u2fa1f]*[a-z_\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u00ff\u0100-\u024f\u0253-\u0254\u0256-\u0257\u0300-\u036f\u1e00-\u1eff\u0400-\u04ff\u0500-\u0527\u2de0-\u2dff\ua640-\ua69f\u0591-\u05bf\u05c1-\u05c2\u05c4-\u05c5\u05d0-\u05ea\u05f0-\u05f4\ufb12-\ufb28\ufb2a-\ufb36\ufb38-\ufb3c\ufb40-\ufb41\ufb43-\ufb44\ufb46-\ufb4f\u0610-\u061a\u0620-\u065f\u066e-\u06d3\u06d5-\u06dc\u06de-\u06e8\u06ea-\u06ef\u06fa-\u06fc\u0750-\u077f\u08a2-\u08ac\u08e4-\u08fe\ufb50-\ufbb1\ufbd3-\ufd3d\ufd50-\ufd8f\ufd92-\ufdc7\ufdf0-\ufdfb\ufe70-\ufe74\ufe76-\ufefc\u200c-\u200c\u0e01-\u0e3a\u0e40-\u0e4e\u1100-\u11ff\u3130-\u3185\ua960-\ua97f\uac00-\ud7af\ud7b0-\ud7ff\uffa1-\uffdc\u30a1-\u30fa\u30fc-\u30fe\uff66-\uff9f\uff10-\uff19\uff21-\uff3a\uff41-\uff5a\u3041-\u3096\u3099-\u309e\u3400-\u4dbf\u4e00-\u9fff\u20000-\u2a6df\u2a700-\u2b73f\u2b740-\u2b81f\u2f800-\u2fa1f][a-z0-9_\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u00ff\u0100-\u024f\u0253-\u0254\u0256-\u0257\u0300-\u036f\u1e00-\u1eff\u0400-\u04ff\u0500-\u0527\u2de0-\u2dff\ua640-\ua69f\u0591-\u05bf\u05c1-\u05c2\u05c4-\u05c5\u05d0-\u05ea\u05f0-\u05f4\ufb12-\ufb28\ufb2a-\ufb36\ufb38-\ufb3c\ufb40-\ufb41\ufb43-\ufb44\ufb46-\ufb4f\u0610-\u061a\u0620-\u065f\u066e-\u06d3\u06d5-\u06dc\u06de-\u06e8\u06ea-\u06ef\u06fa-\u06fc\u0750-\u077f\u08a2-\u08ac\u08e4-\u08fe\ufb50-\ufbb1\ufbd3-\ufd3d\ufd50-\ufd8f\ufd92-\ufdc7\ufdf0-\ufdfb\ufe70-\ufe74\ufe76-\ufefc\u200c-\u200c\u0e01-\u0e3a\u0e40-\u0e4e\u1100-\u11ff\u3130-\u3185\ua960-\ua97f\uac00-\ud7af\ud7b0-\ud7ff\uffa1-\uffdc\u30a1-\u30fa\u30fc-\u30fe\uff66-\uff9f\uff10-\uff19\uff21-\uff3a\uff41-\uff5a\u3041-\u3096\u3099-\u309e\u3400-\u4dbf\u4e00-\u9fff\u20000-\u2a6df\u2a700-\u2b73f\u2b740-\u2b81f\u2f800-\u2fa1f]*)/gi,"<span class='at-hash'>$&</span>");
+
+      var hashArray = curNodeText.split(/(#|＃)([a-z0-9_\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u00ff\u0100-\u024f\u0253-\u0254\u0256-\u0257\u0300-\u036f\u1e00-\u1eff\u0400-\u04ff\u0500-\u0527\u2de0-\u2dff\ua640-\ua69f\u0591-\u05bf\u05c1-\u05c2\u05c4-\u05c5\u05d0-\u05ea\u05f0-\u05f4\ufb12-\ufb28\ufb2a-\ufb36\ufb38-\ufb3c\ufb40-\ufb41\ufb43-\ufb44\ufb46-\ufb4f\u0610-\u061a\u0620-\u065f\u066e-\u06d3\u06d5-\u06dc\u06de-\u06e8\u06ea-\u06ef\u06fa-\u06fc\u0750-\u077f\u08a2-\u08ac\u08e4-\u08fe\ufb50-\ufbb1\ufbd3-\ufd3d\ufd50-\ufd8f\ufd92-\ufdc7\ufdf0-\ufdfb\ufe70-\ufe74\ufe76-\ufefc\u200c-\u200c\u0e01-\u0e3a\u0e40-\u0e4e\u1100-\u11ff\u3130-\u3185\ua960-\ua97f\uac00-\ud7af\ud7b0-\ud7ff\uffa1-\uffdc\u30a1-\u30fa\u30fc-\u30fe\uff66-\uff9f\uff10-\uff19\uff21-\uff3a\uff41-\uff5a\u3041-\u3096\u3099-\u309e\u3400-\u4dbf\u4e00-\u9fff\u20000-\u2a6df\u2a700-\u2b73f\u2b740-\u2b81f\u2f800-\u2fa1f]*[a-z_\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u00ff\u0100-\u024f\u0253-\u0254\u0256-\u0257\u0300-\u036f\u1e00-\u1eff\u0400-\u04ff\u0500-\u0527\u2de0-\u2dff\ua640-\ua69f\u0591-\u05bf\u05c1-\u05c2\u05c4-\u05c5\u05d0-\u05ea\u05f0-\u05f4\ufb12-\ufb28\ufb2a-\ufb36\ufb38-\ufb3c\ufb40-\ufb41\ufb43-\ufb44\ufb46-\ufb4f\u0610-\u061a\u0620-\u065f\u066e-\u06d3\u06d5-\u06dc\u06de-\u06e8\u06ea-\u06ef\u06fa-\u06fc\u0750-\u077f\u08a2-\u08ac\u08e4-\u08fe\ufb50-\ufbb1\ufbd3-\ufd3d\ufd50-\ufd8f\ufd92-\ufdc7\ufdf0-\ufdfb\ufe70-\ufe74\ufe76-\ufefc\u200c-\u200c\u0e01-\u0e3a\u0e40-\u0e4e\u1100-\u11ff\u3130-\u3185\ua960-\ua97f\uac00-\ud7af\ud7b0-\ud7ff\uffa1-\uffdc\u30a1-\u30fa\u30fc-\u30fe\uff66-\uff9f\uff10-\uff19\uff21-\uff3a\uff41-\uff5a\u3041-\u3096\u3099-\u309e\u3400-\u4dbf\u4e00-\u9fff\u20000-\u2a6df\u2a700-\u2b73f\u2b740-\u2b81f\u2f800-\u2fa1f][a-z0-9_\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u00ff\u0100-\u024f\u0253-\u0254\u0256-\u0257\u0300-\u036f\u1e00-\u1eff\u0400-\u04ff\u0500-\u0527\u2de0-\u2dff\ua640-\ua69f\u0591-\u05bf\u05c1-\u05c2\u05c4-\u05c5\u05d0-\u05ea\u05f0-\u05f4\ufb12-\ufb28\ufb2a-\ufb36\ufb38-\ufb3c\ufb40-\ufb41\ufb43-\ufb44\ufb46-\ufb4f\u0610-\u061a\u0620-\u065f\u066e-\u06d3\u06d5-\u06dc\u06de-\u06e8\u06ea-\u06ef\u06fa-\u06fc\u0750-\u077f\u08a2-\u08ac\u08e4-\u08fe\ufb50-\ufbb1\ufbd3-\ufd3d\ufd50-\ufd8f\ufd92-\ufdc7\ufdf0-\ufdfb\ufe70-\ufe74\ufe76-\ufefc\u200c-\u200c\u0e01-\u0e3a\u0e40-\u0e4e\u1100-\u11ff\u3130-\u3185\ua960-\ua97f\uac00-\ud7af\ud7b0-\ud7ff\uffa1-\uffdc\u30a1-\u30fa\u30fc-\u30fe\uff66-\uff9f\uff10-\uff19\uff21-\uff3a\uff41-\uff5a\u3041-\u3096\u3099-\u309e\u3400-\u4dbf\u4e00-\u9fff\u20000-\u2a6df\u2a700-\u2b73f\u2b740-\u2b81f\u2f800-\u2fa1f]*)/);
+
+        // if (hashArray.length>1){
+        //   var newNodes = [];
+        //   var sel = window.getSelection();
+        //   var selectedRange=sel.getRangeAt(0);
+        //   console.log(hashArray);
+        //   for (var i=0;i<hashArray.length;i+=4){
+        //     newNodes.push(document.createTextNode(hashArray[i]));
+        //     var spanText = document.createTextNode("#"+hashArray[i+2]+curChar);
+        //     var newSpan = document.createElement('span');
+        //     newSpan.setAttribute('class','at-hash');
+        //     newSpan.appendChild(spanText);
+        //     newNodes.push(newSpan);
+        //   }
+        //   parentNode.replaceChild(newNodes[newNodes.length-1],curNode);
+        //   for (var j=newNodes.length-2;j>-1;j--){
+        //    parentNode.insertBefore(newNodes[j],newNodes[j+1]); 
+        //   }
+        //   console.log(newNodes);
+        //   placeCaretAtEnd(element[0].children[0]);
+        // };
+        
+
+      // document.getSelection().anchorNode.parentNode.replaceChild(curNodeText,curNodeText);
+      // console.log(document.getSelection().anchorNode.parentNode);
+      // console.log(arrayOfStrings);
+        // curText=curText.replace(/(?:(?:https?):\/\/)?(?:\S+(?::\S*)?@)?(?:(?:([a-z0-9][a-z0-9\-]*)?[a-z0-9]+)(?:\.(?:[a-z0-9\-])*[a-z0-9]+)*(?:\.(?:[a-z]{2,})(:\d{1,5})?))(?:\/[^\s]*)?(?=\s)/gi,"<a href='$1$2'>$1$2</a>");
+        // console.log(curText);
+        // console.log(element[0].children[0].innerHTML);
+        // console.log(element);
+
+        //test for geotag
+        var geo = curNodeText.match(/\^.*/);
+        console.log(geo);
+        geocomplete(geo[0]);
+
+        // var geotag = element[0].innerText.match
+
+
+        // element[0].children[0].innerHTML=curText;
+        placeCaretAtEnd(element[0].children[0]);
+    };
+
     function placeCaretAtEnd(el) {
         el.focus();
         if (typeof window.getSelection != "undefined"
@@ -505,11 +604,12 @@ angular.module('angular-trevor-directives', [])
           method: "GET",
           params: {
           featureClass: "P",
-          username:'demo',
+          username:'testTeam',
           style: "full",
           maxRows: 8,
           // name_startsWith: request.term
           q: word.substr(1),
+          // q:word
             }       
       }).success(function(data, status, headers, config) {
         removeAutoComplete();
@@ -530,7 +630,32 @@ angular.module('angular-trevor-directives', [])
           // or server returns response with an error status.
         });
     };
-
+    function insertNodeAtCaret(node) {
+        if (typeof window.getSelection != "undefined") {
+            var sel = window.getSelection();
+            if (sel.rangeCount) {
+                var range = sel.getRangeAt(0);
+                range.collapse(false);
+                range.insertNode(node);
+                range = range.cloneRange();
+                range.selectNodeContents(node);
+                range.collapse(false);
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
+        } else if (typeof document.selection != "undefined" && document.selection.type != "Control") {
+            var html = (node.nodeType == 1) ? node.outerHTML : node.data;
+            var id = "marker_" + ("" + Math.random()).slice(2);
+            html += '<span id="' + id + '"></span>';
+            var textRange = document.selection.createRange();
+            textRange.collapse(false);
+            textRange.pasteHTML(html);
+            var markerSpan = document.getElementById(id);
+            textRange.moveToElementText(markerSpan);
+            textRange.select();
+            markerSpan.parentNode.removeChild(markerSpan);
+        }
+    }
     function getSelectionContainerElement() {
         var range, sel, container;
         if (document.selection && document.selection.createRange) {
@@ -630,7 +755,7 @@ angular.module('angular-trevor-directives', [])
     link: function($scope,$element, attrs) {
         $scope.uploadImage=function(){
           var file = $scope.myFile;
-          var uploadUrl = 'https://uploadImage';
+          var uploadUrl = 'https://api.test.com/services/rest/file/uploadImage';
           var formObj={
             file:$scope.myFile,
             token:$rootScope.upToken,
