@@ -9,6 +9,7 @@
 		margin: 0 0 .2em 0;
 	}
 	.at-editable{
+		background-color: white;
 		display:block;
 		word-wrap: break-word;
   		word-break: break-all;
@@ -60,12 +61,16 @@
 		color:blue;	
 		font-weight:bold;
 	}
+	.at-url{
+		color:green;	
+		font-weight:bold;
+	}
 	.at-plus{
 		font-size:14px;
 		text-align: center;
 		padding: 0px;
 		background-color: rgb(255, 255, 255);
-		margin: 4px 0px;
+		margin: 0px;
 		color: rgb(175, 175, 175);
 	}
 	.at-plus:hover{
@@ -101,7 +106,7 @@
 		line-height: 26px;
 		font-size: 16px;
 	}
-	
+
 	.atPointer{
 		cursor:pointer;
 	}
@@ -111,6 +116,11 @@
 		/*position:fixed;*/
 		border:solid rgb(219, 219, 219) 1px;
 		/*display:inline;*/
+	}
+
+	.atAutoComp img{
+		max-height: 30px;
+		float: left;
 	}
 
 	.atAutoComp li{
@@ -153,6 +163,11 @@
 		font-weight:bold;		
 	}
 	
+	.at-userTag{
+		color:green;
+		font-weight: bold;
+	}
+
 	.at-text-controls{
 		list-style-type:none;
 		cursor:pointer;
@@ -207,6 +222,10 @@
 		text-align: center;
 		display: table;
 		padding: 0 0 25px 0;
+	}
+
+	.at-img-wrap img{
+		max-width: 100%;
 	}
 
 	.at-img-caption{
